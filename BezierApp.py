@@ -27,16 +27,17 @@ class MyForm(QMainWindow):
         settingPos = QtCore.QPoint(505, 145)
         settingPosX = settingPos.x()
         settingPosY = settingPos.y()
-
         for pos in self.chosenPoints:
+            iter = iter+1
+            if iter>degree+1:
+                break
             x = pos.x()
             y = pos.y()
 
-            settingPosY = settingPosY+10
-            iter = iter+1
+            settingPosY = settingPosY+20
             qp.drawPoint(pos)
             qp.drawText(x-10, y-10, "P {}".format(iter))
-            qp.drawText(settingPosX, settingPosY+10, "P {} {} ".format(iter, pos))
+            qp.drawText(settingPosX, settingPosY+20, "P {} {} ".format(iter, pos))
 
 
     def mouseReleaseEvent(self, cursor_event):
