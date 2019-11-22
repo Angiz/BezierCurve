@@ -48,10 +48,21 @@ class MyForm(QMainWindow):
                 path.moveTo(self.chosenPoints[0].x(), self.chosenPoints[0].y())
                 path.cubicTo(self.chosenPoints[0].x(), self.chosenPoints[0].y(), self.chosenPoints[1].x(), self.chosenPoints[1].y(), self.chosenPoints[2].x(), self.chosenPoints[2].y())
                 qp.drawPath(path)
-            elif (degree == 3) and (iter == 4):
-                qp.setPen(penLine)
+            elif (degree >2) and (iter >3):
                 path.moveTo(self.chosenPoints[0].x(), self.chosenPoints[0].y())
-                path.quadTo(self.chosenPoints[1].x(), self.chosenPoints[1].y(),  self.chosenPoints[3].x(), self.chosenPoints[3].y())
+
+                length = len(self.chosenPoints)
+                for i in range (1, (len(self.chosenPoints)-2)):
+                    p0 = self.chosenPoints[i]
+                    p1 = self.chosenPoints[i+1]
+                    midx = (p0.x() + p1.x()) / 2
+                    midy = (p0.y() + p1.y()) / 2
+                    path.quadTo(p0.x(), p0.y(), midx, midy)
+                    qp.setPen(penLine)
+                    qp.drawPath(path)
+                p0 = self.chosenPoints[length-2]
+                p1 = self.chosenPoints[length-1]
+                path.quadTo(p0.x(), p0.y(), p1.x(), p1.y())
                 qp.drawPath(path)
         qp.end()
 
@@ -63,8 +74,6 @@ class MyForm(QMainWindow):
     def mouseReleaseEvent(self, cursor_event):
         self.chosenPoints.append(cursor_event.pos())
         self.update()
-
-
 
 
 if __name__=="__main__":
