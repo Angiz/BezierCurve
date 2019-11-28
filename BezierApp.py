@@ -13,6 +13,10 @@ class MyForm(QMainWindow):
         self.ui.polynomialButton.clicked.connect(self.getDegree)
         self.ui.clearButton.clicked.connect(self.Clearing)
         self.chosenPoints = []
+        self.setAcceptDrops(True)
+        self.dragPoint = None
+        self.dragOffset = None
+
         self.show()
 
     def getDegree(self):
@@ -31,7 +35,6 @@ class MyForm(QMainWindow):
         settingPos = QtCore.QPoint(505, 145)
         settingPosX = settingPos.x()
         settingPosY = settingPos.y()
-
         for pos in self.chosenPoints:
             iter = iter+1
             if iter>degree+1:
@@ -73,13 +76,67 @@ class MyForm(QMainWindow):
         qp.end()
 
 
-    def mousePressEvent(self, event):
-        if event.buttons() & QtCore.Qt.LeftButton:
-            print("Jakis tymczasowy tekst, dopoki nie bede miala pomyslu, co z tym zrobic")
-
     def mouseReleaseEvent(self, cursor_event):
         self.chosenPoints.append(cursor_event.pos())
+        ##cursor_event.accept()
         self.update()
+
+    ### Wersja, która działa tylko ze zmianą kursora ###
+
+    """def mouseMoveEvent(self, cursor_event):
+        if (cursor_event.buttons() and Qt.LeftButton):
+            drag = QtGui.QDrag(self)
+            drag.setMimeData(QtCore.QMimeData())
+            drag.exec_(QtCore.Qt.LinkAction)
+            self.update()
+
+
+    def dragEnterEvent(self, cursor_event):
+        print (cursor_event.mimeData().colorData())
+        if cursor_event.mimeData()==self.chosenPoints:
+
+            cursor_event.accept()
+        else:
+            print("test")
+            cursor_event.ignore()
+          ##  cursor_event.accept()
+
+
+    def dropEvent(self, cursor_event):
+        cursor_event.setDropAction(Qt.MoveAction)
+        cursor_event.accept()"""
+
+    ### Wersja wedlug dokumentacji Qt z C++ ###
+
+    def mousePressEvent(self, cursor_event):
+        if (cursor_event.button() == Qt.LeftButton):
+
+            self.dragPoint = cursor_event.pos()
+
+    def mouseMoveEvent(self, cursor_event):
+
+        if (not(cursor_event.buttons()) and Qt.LeftButton):
+            return
+        p = cursor_event.pos() - self.dragPoint
+        if (p.manhattanLength() < QApplication.startDragDistance()):
+            return
+
+        drag = QtGui.QDrag(self)
+        mimedata = QtCore.QMimeData()
+        drag.setMimeData(mimedata)
+        drag.exec_(QtCore.Qt.LinkAction)
+        ##self.update()  ### ?
+
+    def dragEnterEvent(self, cursor_event):
+        if cursor_event.mimeData().colorData() == Qt.black:
+            cursor_event.acceptProposedAction()
+
+    def dropEvent(self, cursor_event):
+        self.ui.drawingLabel.addItems(cursor_event.mimeData())
+        cursor_event.acceptProposedAction()
+
+
+
 
 
 if __name__=="__main__":
